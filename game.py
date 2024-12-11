@@ -24,6 +24,16 @@ def main():
             print('Пожалуйста, введите значения для строки и столбца заново.')
             continue
 
+        except ValueError:
+            print('Вводить можно только целые числа.')
+            print('Пожалуйста, введите значения для строки и столбца заново.')
+            continue
+
+        except Exception as e:
+            print(f'Возникла ошибка: {e}')
+            print('Попробуйте ещё раз.')
+            continue
+
         else:
             break
 
