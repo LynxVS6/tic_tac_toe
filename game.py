@@ -51,13 +51,16 @@ def main():
 
         game.make_move(row, column, current_player)
         game.display()
-        
+
+        if game.check_win(current_player):
+            print(f'Победили {current_player}!')
+            running = False
+
+        elif game.is_board_full():
+            print('Ничья!')
+            running = False
+
         current_player = 'O' if current_player == 'X' else 'X'
-
-    game.make_move(row, column, 'X')
-    print('Ход сделан!')
-    game.display()
-
 
 if __name__ == '__main__':
     main()
