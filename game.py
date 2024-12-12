@@ -1,75 +1,53 @@
+import pygame
+
 from gameparts import Board
-from gameparts.exceptions import CellOccupiedError, FieldIndexError
+from interface import draw_lines, draw_figures, CELL_SIZE
 
 
 def save_result(result):
     with open('results.txt', 'a', encoding='utf-8') as file:
         file.write(result + '\n')
 
-
 def main():
     game = Board()
     current_player = 'X'
     running = True
-    game.display()
+    draw_lines()
 
     while running:
-        print(f'Ход делают {current_player}')
 
-        while True:
-            try:
-                row = int(input('Введите номер строки: '))
-                if row < 0 or row >= game.field_size:
-                    raise FieldIndexError
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
-                column = int(input('Введите номер столбца: '))
-                if column < 0 or column >= game.field_size:
-                    raise FieldIndexError
-                
-                if game.board[row][column] != ' ':
-                    raise CellOccupiedError
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_y = event.pos[0]
+                mouse_x = event.pos[1]
 
-            except FieldIndexError:
-                print(
-                    'Значение должно быть неотрицательным и меньше '
-                    f'{game.field_size}.'
-                )
-                print('Пожалуйста, введите значения для строки и столбца заново.')
-                continue
-            
-            except CellOccupiedError:
-                print('Ячейка занята')
-                print('Введите другие координаты.')
-                continue
+                clicked_row = mouse_x // CELL_SIZE
+                clicked_col = mouse_y // CELL_SIZE
 
-            except ValueError:
-                print('Вводить можно только целые числа.')
-                print('Пожалуйста, введите значения для строки и столбца заново.')
-                continue
+                if game.board[clicked_row][clicked_col] == ' ':
+                    game.make_move(clicked_row, clicked_col, current_player)
 
-            except Exception as e:
-                print(f'Возникла ошибка: {e}')
-                print('Попробуйте ещё раз.')
+                    if game.check_win(current_player):
+                        result = f'Победили {current_player}.'
+                        print(result)
+                        save_result(result)
+                        running = False
 
-            else:
-                break
+                    elif game.is_board_full():
+                        result = 'Ничья!'
+                        print(result)
+                        save_result(result)
+                        running = False
 
-        game.make_move(row, column, current_player)
-        game.display()
+                    current_player = 'O' if current_player == 'X' else 'X'
+                    draw_figures(game.board)
 
-        if game.check_win(current_player):
-            result = f'Победили {current_player}.'
-            print(result)
-            save_result(result)
-            running = False
+        pygame.display.update()
 
-        elif game.is_board_full():
-            result = 'Ничья!'
-            print(result)
-            save_result(result)
-            running = False
-
-        current_player = 'O' if current_player == 'X' else 'X'
+    pygame.quit()
 
 if __name__ == '__main__':
     main()

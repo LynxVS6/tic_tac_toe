@@ -12,11 +12,6 @@ class Board:
     def make_move(self, row, col, player):
         self.board[row][col] = player
 
-    def display(self):
-        for row in self.board:
-            print('|'.join(row))
-            print('-' * 5)
-
     def check_win(self, player):
         for i in range(3):
             if (all([self.board[i][j] == player for j in range(3)]) or
