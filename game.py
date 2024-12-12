@@ -1,41 +1,58 @@
 from gameparts import Board
-from gameparts.exceptions import FieldIndexError
+from gameparts.exceptions import CellOccupiedError, FieldIndexError
 
 
 def main():
     game = Board()
+    current_player = 'X'
+    running = True
     game.display()
 
-    while True:
-        try:
-            row = int(input('Введите номер строки: '))
-            if row < 0 or row >= game.field_size:
-                raise FieldIndexError
+    while running:
+        print(f'Ход делают {current_player}')
 
-            column = int(input('Введите номер столбца: '))
-            if column < 0 or column >= game.field_size:
-                raise FieldIndexError
+        while True:
+            try:
+                row = int(input('Введите номер строки: '))
+                if row < 0 or row >= game.field_size:
+                    raise FieldIndexError
 
-        except FieldIndexError:
-            print(
-                'Значение должно быть неотрицательным и меньше '
-                f'{game.field_size}.'
-            )
-            print('Пожалуйста, введите значения для строки и столбца заново.')
-            continue
+                column = int(input('Введите номер столбца: '))
+                if column < 0 or column >= game.field_size:
+                    raise FieldIndexError
+                
+                if game.board[row][column] != ' ':
+                    raise CellOccupiedError
 
-        except ValueError:
-            print('Вводить можно только целые числа.')
-            print('Пожалуйста, введите значения для строки и столбца заново.')
-            continue
+            except FieldIndexError:
+                print(
+                    'Значение должно быть неотрицательным и меньше '
+                    f'{game.field_size}.'
+                )
+                print('Пожалуйста, введите значения для строки и столбца заново.')
+                continue
+            
+            except CellOccupiedError:
+                print('Ячейка занята')
+                print('Введите другие координаты.')
+                continue
 
-        except Exception as e:
-            print(f'Возникла ошибка: {e}')
-            print('Попробуйте ещё раз.')
-            continue
+            except ValueError:
+                print('Вводить можно только целые числа.')
+                print('Пожалуйста, введите значения для строки и столбца заново.')
+                continue
 
-        else:
-            break
+            except Exception as e:
+                print(f'Возникла ошибка: {e}')
+                print('Попробуйте ещё раз.')
+
+            else:
+                break
+
+        game.make_move(row, column, current_player)
+        game.display()
+        
+        current_player = 'O' if current_player == 'X' else 'X'
 
     game.make_move(row, column, 'X')
     print('Ход сделан!')
